@@ -1,0 +1,65 @@
+proc import out = method
+datafile = "\\Client\E$\DOCS\CKME130\Assignment1\exec_time_format_i.csv"
+dbms=csv replace; getnames=yes;
+run;
+
+proc univariate data = method;
+histogram exec_time;
+by input_type;
+run;
+
+proc univariate data = method normal;
+by input_type;
+run;
+---------------- 1. PAIRED T TEST
+proc import out=my_data
+datafile =   "\\Client\E$\DOCS\CKME130\Assignment1\exec_time_format_p.csv"
+dbms = csv replace ; getnames=yes;
+run;
+
+proc ttest data = my_data;
+title "two samples paired t-test examples";
+paired zip_type_exec_time * xml_type_exec_time;
+run;
+
+
+-------------------2. PAIRED Wilcoxon Signed Rank Test
+proc import out=my_data
+datafile =   "\\Client\E$\DOCS\CKME130\Assignment1\exec_time_format_p.csv"
+dbms = csv replace ; getnames=yes;
+run;
+
+data diff_columns_data;
+set my_data;
+diff = zip_type_exec_time - xml_type_exec_time;
+run
+
+proc univariate data = diff_columns_data;
+var diff;
+run;
+
+------------------- 3. Independent T Test
+proc import out = method
+datafile = "\\Client\E$\DOCS\CKME130\Assignment1\exec_time_format_i.csv"
+dbms=csv replace; getnames=yes;
+run;
+
+proc ttest data=my_data  sides=2 alpha=0.05 h0=0;
+ title "Two independent samples t-test example";
+ class input_type; 
+ var exec_time;
+run;
+
+
+---------------------4. Independent) MannWhitney U Test
+proc import out = method
+datafile = "\\Client\E$\DOCS\CKME130\Assignment1\exec_time_format_i.csv"
+dbms=csv replace; getnames=yes;
+run;
+
+proc npar1way data =my_data wilcoxon;
+ title "Mann Whitney U Test Example";
+ class input_type;
+ var exec_time;
+run;
+
